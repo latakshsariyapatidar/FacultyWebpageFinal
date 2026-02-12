@@ -9,8 +9,6 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
-const SPREADSHEET_ID = process.env.GOOGLE_SPREADSHEET_ID || "1NJUIvdLLjdzpGRuMrH-d-MHhbZh6ishMWehDnJzLB5U";
-
 // Initialize Google Auth with environment variable or file
 function getGoogleAuth() {
   try {
@@ -73,14 +71,14 @@ const SHEETS = {
   resources: "Resources",
 };
 
-// Fetch sheet data
-async function fetchSheet(sheetName, range = "A1:Z100") {
+// Fetch sheet data from a specific spreadsheet
+async function fetchSheet(spreadsheetId, sheetName, range = "A1:Z100") {
   const auth = getGoogleAuth();
   const client = await auth.getClient();
   const sheets = google.sheets({ version: "v4", auth: client });
 
   const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
+    spreadsheetId: spreadsheetId,
     range: `${sheetName}!${range}`,
   });
 
@@ -89,6 +87,7 @@ async function fetchSheet(sheetName, range = "A1:Z100") {
 
 // Convert rows to objects
 function rowsToObjects(rows) {
+  if (!rows || rows.length === 0) return [];
   const headers = rows[0];
   return rows.slice(1).map((row) =>
     headers.reduce((obj, header, i) => {
@@ -98,129 +97,139 @@ function rowsToObjects(rows) {
   );
 }
 
-// Group objects by faculty_id
-function groupByFaculty(data) {
-  const result = {};
-  data.forEach((item) => {
-    const id = item.faculty_id;
-    if (!result[id]) result[id] = [];
-    result[id].push(item);
-  });
-  return result;
-}
+/**
+ * Generate JSON for a specific faculty's Google Sheet
+ * @param {string} sheetID - The Google Sheet ID for the faculty
+ * @returns {Promise<Object>} - Faculty data object
+ */
+export async function generateFacultyJSONFromSheet(sheetID) {
+  try {
+    console.log(`📄 Fetching data from sheet: ${sheetID}`);
+    
+    const auth = getGoogleAuth();
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: "v4", auth: client });
 
-// Generate JSON for all faculty
-export async function generateAllFacultyJSON() {
-  // Fetch all sheets
-  const personalRows = await fetchSheet(SHEETS.personalInfo);
-  const personal = rowsToObjects(personalRows);
+    // Helper to fetch from specific sheet with error handling
+    const fetchSheetData = async (sheetName, range = "A1:Z100") => {
+      try {
+        const res = await sheets.spreadsheets.values.get({
+          spreadsheetId: sheetID,
+          range: `${sheetName}!${range}`,
+        });
+        return res.data.values || [];
+      } catch (error) {
+        console.log(`  ⚠️  Sheet "${sheetName}" not found or empty, skipping...`);
+        return [];
+      }
+    };
 
-  const aboutRows = await fetchSheet(SHEETS.about);
-  const about = rowsToObjects(aboutRows);
+    // Fetch all sheets with error handling
+    const personalRows = await fetchSheetData(SHEETS.personalInfo);
+    const personal = rowsToObjects(personalRows);
 
-  const researchRows = await fetchSheet(SHEETS.researchPositions);
-  const research = rowsToObjects(researchRows);
+    const aboutRows = await fetchSheetData(SHEETS.about);
+    const about = rowsToObjects(aboutRows);
 
-  const linksRows = await fetchSheet(SHEETS.links);
-  const links = rowsToObjects(linksRows);
+    const researchRows = await fetchSheetData(SHEETS.researchPositions);
+    const research = rowsToObjects(researchRows);
 
-  const experienceRows = await fetchSheet(SHEETS.experience);
-  const experience = rowsToObjects(experienceRows);
+    const linksRows = await fetchSheetData(SHEETS.links);
+    const links = rowsToObjects(linksRows);
 
-  const educationRows = await fetchSheet(SHEETS.education);
-  const education = rowsToObjects(educationRows);
+    const experienceRows = await fetchSheetData(SHEETS.experience);
+    const experience = rowsToObjects(experienceRows);
 
-  const coursesRows = await fetchSheet(SHEETS.courses);
-  const courses = rowsToObjects(coursesRows).map((c) => ({ ...c, credits: Number(c.credits) }));
+    const educationRows = await fetchSheetData(SHEETS.education);
+    const education = rowsToObjects(educationRows);
 
-  const interestsRows = await fetchSheet(SHEETS.researchInterests);
-  const interests = rowsToObjects(interestsRows);
+    const coursesRows = await fetchSheetData(SHEETS.courses);
+    const courses = rowsToObjects(coursesRows).map((c) => ({ 
+      ...c, 
+      credits: Number(c.credits) || 0,
+      status: c.status || 'current'
+    }));
 
-  const fundingRows = await fetchSheet(SHEETS.fundingInfo);
-  const funding = rowsToObjects(fundingRows);
+    const interestsRows = await fetchSheetData(SHEETS.researchInterests);
+    const interests = rowsToObjects(interestsRows);
 
-  const reqRows = await fetchSheet(SHEETS.fundingRequirements);
-  const requirements = rowsToObjects(reqRows);
+    const fundingRows = await fetchSheetData(SHEETS.fundingInfo);
+    const funding = rowsToObjects(fundingRows);
 
-  const patentsRows = await fetchSheet(SHEETS.patents);
-  const patents = rowsToObjects(patentsRows);
+    const reqRows = await fetchSheetData(SHEETS.fundingRequirements);
+    const requirements = rowsToObjects(reqRows);
 
-  const journalsRows = await fetchSheet(SHEETS.journals);
-  const journals = rowsToObjects(journalsRows);
+    const patentsRows = await fetchSheetData(SHEETS.patents);
+    const patents = rowsToObjects(patentsRows);
 
-  const confRows = await fetchSheet(SHEETS.conferences);
-  const conferences = rowsToObjects(confRows);
+    const journalsRows = await fetchSheetData(SHEETS.journals);
+    const journals = rowsToObjects(journalsRows);
 
-  const bookChaptersRows = await fetchSheet(SHEETS.bookChapters);
-  const bookChapters = rowsToObjects(bookChaptersRows);
+    const confRows = await fetchSheetData(SHEETS.conferences);
+    const conferences = rowsToObjects(confRows);
 
-  const instrRows = await fetchSheet(SHEETS.studentInstructions);
-  const instructions = rowsToObjects(instrRows);
+    const bookChaptersRows = await fetchSheetData(SHEETS.bookChapters);
+    const bookChapters = rowsToObjects(bookChaptersRows);
 
-  const currentRows = await fetchSheet(SHEETS.currentStudents);
-  const currentStudents = rowsToObjects(currentRows);
+    const instrRows = await fetchSheetData(SHEETS.studentInstructions);
+    const instructions = rowsToObjects(instrRows);
 
-  const graduatedRows = await fetchSheet(SHEETS.graduatedStudents);
-  const graduatedStudents = rowsToObjects(graduatedRows);
+    const currentRows = await fetchSheetData(SHEETS.currentStudents);
+    const currentStudents = rowsToObjects(currentRows);
 
-  const newsRows = await fetchSheet(SHEETS.news);
-  const news = rowsToObjects(newsRows);
+    const graduatedRows = await fetchSheetData(SHEETS.graduatedStudents);
+    const graduatedStudents = rowsToObjects(graduatedRows);
 
-  const imageRows = await fetchSheet(SHEETS.image);
-  const images = rowsToObjects(imageRows);
+    const newsRows = await fetchSheetData(SHEETS.news);
+    const news = rowsToObjects(newsRows);
 
-  const statsRows = await fetchSheet(SHEETS.stats);
-  const stats = rowsToObjects(statsRows);
+    const imageRows = await fetchSheetData(SHEETS.image);
+    const images = rowsToObjects(imageRows);
 
-  const resourcesRows = await fetchSheet(SHEETS.resources);
-  const resources = rowsToObjects(resourcesRows);
+    const statsRows = await fetchSheetData(SHEETS.stats);
+    const stats = rowsToObjects(statsRows);
 
-  // Get unique faculty IDs from personalInfo
-  const facultyIds = [...new Set(personal.map(p => p.faculty_id))];
+    const resourcesRows = await fetchSheetData(SHEETS.resources);
+    const resources = rowsToObjects(resourcesRows);
 
-  // Build JSON per faculty
-  const allFaculty = facultyIds.map((id) => {
-    return {
-      faculty_id: id,
-      facultyID: id, // Add both for compatibility
-      personalInfo: personal.find(p => p.faculty_id === id) || {},
+    // Build faculty data (single faculty per sheet)
+    const personalInfo = personal[0] || {};
+    const facultyId = personalInfo.faculty_id || personalInfo.facultyID || "unknown";
+
+    const facultyData = {
+      faculty_id: facultyId,
+      facultyID: facultyId,
+      personalInfo: personalInfo,
       about: {
-        ...about.find(a => a.faculty_id === id),
-        researchPositions: research.filter(r => r.faculty_id === id).map(r => ({
-          position: r.Position || r.position || r.field,
+        ...about[0],
+        researchPositions: research.map(r => ({
+          position: r.Position || r.position || r.field || '',
           application_link: r.application_link || r.applicationLink || '',
           email_template: r.email_template || r.emailTemplate || ''
         })),
-        links: links.filter(l => l.faculty_id === id),
+        links: links,
       },
       biography: {
-        experience: experience.filter(e => e.faculty_id === id),
-        education: education.filter(e => e.faculty_id === id),
+        experience: experience,
+        education: education,
       },
-      courses: courses.filter(c => c.faculty_id === id).map(c => ({
-        ...c,
-        status: c.status || 'current' // 'current' or 'past'
-      })),
+      courses: courses,
       research: {
-        interests: interests.filter(i => i.faculty_id === id).map(i => ({
-          title: i.title || i.Title || i.Interest || i.interest,
+        interests: interests.map(i => ({
+          title: i.title || i.Title || i.Interest || i.interest || '',
           description: i.description || i.Description || '',
           image: i.image || i.Image || ''
         })),
         fundingInfo: (() => {
-          // Get all funding info rows for this faculty
-          const fundingRows = funding.filter(f => f.faculty_id === id);
           const fundingObj = {};
           
-          // Convert vertical format (field, value) to horizontal object
-          fundingRows.forEach(row => {
+          funding.forEach(row => {
             const field = row.field;
             const value = row.value;
             if (field && value) {
               fundingObj[field] = value;
             }
             
-            // Also capture direct column values for application links/templates
             if (row.phd_application_link) fundingObj.phd_application_link = row.phd_application_link;
             if (row.phd_email_template) fundingObj.phd_email_template = row.phd_email_template;
             if (row.mtech_application_link) fundingObj.mtech_application_link = row.mtech_application_link;
@@ -235,38 +244,38 @@ export async function generateAllFacultyJSON() {
             phd_email_template: fundingObj.phd_email_template || '',
             mtech_application_link: fundingObj.mtech_application_link || '',
             mtech_email_template: fundingObj.mtech_email_template || '',
-            requirements: requirements.filter(r => r.faculty_id === id).map(r => ({
+            requirements: requirements.map(r => ({
               position_id: r.position_id || r.positionId || '',
-              requirement: r.requirement || r.Requirement || r.field || r.value
+              requirement: r.requirement || r.Requirement || r.field || r.value || ''
             }))
           };
         })()
       },
       publications: {
-        patents: patents.filter(p => p.faculty_id === id).map(p => ({
+        patents: patents.map(p => ({
           ...p,
           pdf_link: p.pdf_link || p.pdfLink || '',
           external_link: p.external_link || p.externalLink || ''
         })),
-        journals: journals.filter(j => j.faculty_id === id).map(j => ({
+        journals: journals.map(j => ({
           ...j,
           pdf_link: j.pdf_link || j.pdfLink || '',
           external_link: j.external_link || j.externalLink || ''
         })),
-        conferences: conferences.filter(c => c.faculty_id === id).map(c => ({
+        conferences: conferences.map(c => ({
           ...c,
           pdf_link: c.pdf_link || c.pdfLink || '',
           external_link: c.external_link || c.externalLink || ''
         })),
-        bookChapters: bookChapters.filter(b => b.faculty_id === id).map(b => ({
+        bookChapters: bookChapters.map(b => ({
           ...b,
           pdf_link: b.pdf_link || b.pdfLink || '',
           external_link: b.external_link || b.externalLink || ''
         }))
       },
       students: {
-        instructions: instructions.filter(i => i.faculty_id === id).map(i => i.instruction || i.Instruction || i.field),
-        current: currentStudents.filter(s => s.faculty_id === id).map(s => ({
+        instructions: instructions.map(i => i.instruction || i.Instruction || i.field || ''),
+        current: currentStudents.map(s => ({
           ...s,
           degree_type: s.degree_type || s.degreeType || s.program || 'PhD',
           photo: s.photo || s.Photo || '',
@@ -274,7 +283,7 @@ export async function generateAllFacultyJSON() {
           start_date: s.start_date || s.startDate || '',
           end_date: s.end_date || s.endDate || ''
         })),
-        graduated: graduatedStudents.filter(s => s.faculty_id === id).map(s => ({
+        graduated: graduatedStudents.map(s => ({
           ...s,
           degree_type: s.degree_type || s.degreeType || s.program || 'PhD',
           photo: s.photo || s.Photo || '',
@@ -283,35 +292,47 @@ export async function generateAllFacultyJSON() {
           end_date: s.end_date || s.endDate || s.year || ''
         })),
       },
-      news: news.filter(n => n.faculty_id === id).map(n => ({
+      news: news.map(n => ({
         title: n.title || n.Title || '',
         description: n.description || n.Description || n.content || n.Content || 
                     n.news || n.News || n.text || n.Text || '',
         image: n.image || n.Image || n.photo || n.Photo || '',
         date: n.date || n.Date || n.published_date || n.publishedDate || 
               n.published || n.Published || ''
-      })).filter(item => item.title || item.description), // Keep items with at least title or description
-      gallery: images.filter(img => img.faculty_id === id).map(img => ({
-        url: img.gallery_images || img.gallery_image,
+      })).filter(item => item.title || item.description),
+      gallery: images.map(img => ({
+        url: img.gallery_images || img.gallery_image || '',
         alt: img.image_alternate_text || img.alt_text || '',
         caption: img.caption || img.Caption || '',
-        caption_position: img.caption_position || img.captionPosition || 'after' // 'before' or 'after'
+        caption_position: img.caption_position || img.captionPosition || 'after'
       })),
-      statistics: stats.filter(s => s.faculty_id === id).map(s => ({
+      statistics: stats.map(s => ({
         label: s.label || s.Label || s.name || s.Name || '',
         value: s.value || s.Value || s.count || s.Count || '0',
         icon: s.icon || s.Icon || '',
         description: s.description || s.Description || ''
       })),
-      resources: resources.filter(r => r.faculty_id === id).map(r => ({
+      resources: resources.map(r => ({
         title: r.title || r.Title || '',
         description: r.description || r.Description || '',
         link: r.link || r.Link || r.drive_link || r.driveLink || '',
         category: r.category || r.Category || r.type || r.Type || '',
         date: r.date || r.Date || r.uploaded_date || r.uploadedDate || ''
-      })).filter(r => r.title || r.link) // Keep items with at least title or link
+      })).filter(r => r.title || r.link),
+      lastFetched: new Date().toISOString()
     };
-  });
 
-  return allFaculty;
+    console.log(`✅ Successfully fetched data for faculty: ${facultyId}`);
+    return facultyData;
+    
+  } catch (error) {
+    console.error(`❌ Error fetching sheet ${sheetID}:`, error);
+    throw new Error(`Failed to fetch data from Google Sheet: ${error.message}`);
+  }
+}
+
+// Generate JSON for all faculty (DEPRECATED - kept for backwards compatibility)
+export async function generateAllFacultyJSON() {
+  console.warn("⚠️  generateAllFacultyJSON is deprecated. Use individual faculty sheets instead.");
+  throw new Error("This function is deprecated. Please use the new multi-faculty system.");
 }

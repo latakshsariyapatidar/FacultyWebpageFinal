@@ -14,7 +14,8 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
  * API endpoints configuration
  */
 export const API_ENDPOINTS = {
-  FACULTY_DATA: `${API_BASE_URL}/api/faculty`,
+  FACULTY_LIST: `${API_BASE_URL}/api/faculty`,
+  FACULTY_DATA: (facultyId) => `${API_BASE_URL}/api/faculty/${facultyId}`,
 };
 
 /**

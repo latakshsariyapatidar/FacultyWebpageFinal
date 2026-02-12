@@ -1,0 +1,22 @@
+[
+  {
+    "facultyID": "FAC001",
+    "sheetID": "1NJUIvdLLjdzpGRuMrH-d-MHhbZh6ishMWehDnJzLB5U",
+    "name": "Pratyasa Bhui",
+    "email": "pbhui@iitdh.ac.in",
+    "department": "Electrical Engineering",
+    "jsonFile": "FAC001.json",
+    "registeredAt": "2026-02-12T19:16:30.862Z",
+    "lastUpdated": "2026-02-12T19:40:46.438Z"
+  },
+  {
+    "facultyID": "FAC002",
+    "sheetID": "1E_bHyI2zxukwMRxowmx47cWs-N6cCnBGKFWkC2tDWdc",
+    "name": "Professor2",
+    "email": "lataksh.sariya@axl",
+    "department": "electrical",
+    "jsonFile": "FAC002.json",
+    "registeredAt": "2026-02-12T19:40:07.142Z",
+    "lastUpdated": "2026-02-12T19:41:01.006Z"
+  }
+]

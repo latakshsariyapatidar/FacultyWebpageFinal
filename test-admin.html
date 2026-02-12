@@ -3,34 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Admin Refresh</title>
+    <title>Faculty Admin Panel</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
             padding: 20px;
+            background: #f5f5f5;
         }
-        .container {
-            border: 1px solid #ddd;
-            padding: 20px;
+        .header {
+            background: linear-gradient(135deg, #89288f 0%, #6b1f72 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .section {
+            background: white;
+            padding: 25px;
+            margin: 20px 0;
             border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        input {
+        .section h2 {
+            margin-top: 0;
+            color: #89288f;
+            border-bottom: 2px solid #89288f;
+            padding-bottom: 10px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #89288f;
         }
         button {
             background: #89288f;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
             width: 100%;
+            margin-top: 10px;
+            transition: background 0.3s;
         }
         button:hover {
             background: #6b1f72;
@@ -39,99 +75,356 @@
             background: #ccc;
             cursor: not-allowed;
         }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
         .message {
             margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 14px;
         }
         .success {
             background: #d4edda;
             color: #155724;
+            border: 1px solid #c3e6cb;
         }
         .error {
             background: #f8d7da;
             color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        .faculty-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .faculty-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #89288f;
+        }
+        .faculty-item h4 {
+            margin: 0 0 8px 0;
+            color: #89288f;
+        }
+        .faculty-item p {
+            margin: 4px 0;
+            font-size: 13px;
+            color: #666;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🔑 Admin: Refresh Database</h2>
-        <p>Enter secret key to fetch latest data from Google Sheets</p>
+    <div class="header">
+        <h1>🎓 Faculty Management System</h1>
+        <p>Multi-Faculty Google Sheets Integration</p>
+    </div>
+
+    <!-- Register New Faculty -->
+    <div class="section">
+        <h2>1️⃣ Register New Faculty</h2>
+        <div class="info">
+            Each faculty member has their own Google Sheet. Register them here with their unique Sheet ID.
+        </div>
         
-        <input 
-            type="password" 
-            id="secretKey" 
-            placeholder="Enter secret key"
-            onkeypress="if(event.key==='Enter') refreshDatabase()"
-        >
+        <div class="input-group">
+            <label>Faculty ID *</label>
+            <input type="text" id="newFacultyId" placeholder="e.g., prof_john_doe or cs_ramesh_kumar">
+            <div class="help-text">Unique identifier (alphanumeric, dots, underscores, hyphens only)</div>
+        </div>
         
-        <button onclick="refreshDatabase()" id="refreshBtn">
-            🔄 Refresh from Google Sheets
-        </button>
+        <div class="input-group">
+            <label>Google Sheet ID *</label>
+            <input type="text" id="newSheetId" placeholder="e.g., 1ABC123XYZ456...">
+            <div class="help-text">Copy from the Google Sheet URL: docs.google.com/spreadsheets/d/<code>[SHEET_ID]</code>/edit</div>
+        </div>
         
-        <div id="message"></div>
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="newName" placeholder="Dr. John Doe (optional)">
+        </div>
         
-        <hr style="margin: 20px 0;">
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="newEmail" placeholder="john.doe@iitdh.ac.in (optional)">
+        </div>
         
-        <h3>📝 Instructions:</h3>
-        <ul>
-            <li>Default secret key: <code>iitdh_faculty_secret_2024</code></li>
-            <li>Or visit: <a href="http://localhost:5000/api/fetchLatest/iitdh_faculty_secret_2024" target="_blank">http://localhost:5000/api/fetchLatest/iitdh_faculty_secret_2024</a></li>
-            <li>This will fetch latest data from Google Sheets</li>
-            <li>Database (facultyData.json) will be updated</li>
-            <li>All faculty pages will show updated data</li>
-        </ul>
+        <div class="input-group">
+            <label>Department</label>
+            <input type="text" id="newDepartment" placeholder="Computer Science (optional)">
+        </div>
+        
+        <div class="input-group">
+            <label>Secret Key *</label>
+            <input type="password" id="secretKey1" placeholder="Enter admin secret key">
+        </div>
+        
+        <button onclick="registerFaculty()">✅ Register Faculty</button>
+        <div id="registerResponse"></div>
+    </div>
+
+    <!-- Refresh Single Faculty -->
+    <div class="section">
+        <h2>2️⃣ Refresh Single Faculty Data</h2>
+        <div class="info">
+            Fetch latest data from a specific faculty's Google Sheet.
+        </div>
+        
+        <div class="input-group">
+            <label>Faculty ID *</label>
+            <input type="text" id="refreshFacultyId" placeholder="e.g., prof_john_doe">
+        </div>
+        
+        <div class="input-group">
+            <label>Secret Key *</label>
+            <input type="password" id="secretKey2" placeholder="Enter admin secret key">
+        </div>
+        
+        <button onclick="refreshFaculty()">🔄 Fetch Data from Sheet</button>
+        <div id="refreshResponse"></div>
+    </div>
+
+    <!-- Refresh All Faculty -->
+    <div class="section">
+        <h2>3️⃣ Refresh All Faculty Data</h2>
+        <div class="info">
+            Fetch data from Google Sheets for all registered faculty members.
+        </div>
+        
+        <div class="input-group">
+            <label>Secret Key *</label>
+            <input type="password" id="secretKey3" placeholder="Enter admin secret key">
+        </div>
+        
+        <button onclick="refreshAll()">🔄 Refresh All Faculty</button>
+        <div id="refreshAllResponse"></div>
+    </div>
+
+    <!-- View Faculty List -->
+    <div class="section">
+        <h2>4️⃣ View All Registered Faculty</h2>
+        <button class="btn-secondary" onclick="viewFacultyList()">📋 View Faculty List</button>
+        <div id="facultyList" class="faculty-list"></div>
+    </div>
+
+    <!-- Delete Faculty -->
+    <div class="section">
+        <h2>5️⃣ Delete Faculty</h2>
+        <div class="info" style="background: #fff3cd; color: #856404; border-color: #ffeeba;">
+            ⚠️ Warning: This will permanently delete the faculty and their data file.
+        </div>
+        
+        <div class="input-group">
+            <label>Faculty ID *</label>
+            <input type="text" id="deleteFacultyId" placeholder="e.g., prof_john_doe">
+        </div>
+        
+        <div class="input-group">
+            <label>Secret Key *</label>
+            <input type="password" id="secretKey4" placeholder="Enter admin secret key">
+        </div>
+        
+        <button class="btn-danger" onclick="deleteFaculty()">🗑️ Delete Faculty</button>
+        <div id="deleteResponse"></div>
     </div>
 
     <script>
-        async function refreshDatabase() {
-            const secretKey = document.getElementById('secretKey').value;
-            const messageDiv = document.getElementById('message');
-            const btn = document.getElementById('refreshBtn');
+        const API_BASE = 'http://localhost:5000/api';
+        
+        async function registerFaculty() {
+            const facultyID = document.getElementById('newFacultyId').value.trim();
+            const sheetID = document.getElementById('newSheetId').value.trim();
+            const name = document.getElementById('newName').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+            const department = document.getElementById('newDepartment').value.trim();
+            const secretKey = document.getElementById('secretKey1').value.trim();
             
-            if (!secretKey.trim()) {
-                messageDiv.className = 'message error';
-                messageDiv.textContent = '❌ Please enter the secret key';
+            if (!facultyID || !sheetID || !secretKey) {
+                showResponse('registerResponse', { message: 'Faculty ID, Sheet ID, and Secret Key are required' }, false);
                 return;
             }
             
-            btn.disabled = true;
-            btn.textContent = '⏳ Updating...';
-            messageDiv.textContent = '';
-            
             try {
-                const response = await fetch('http://localhost:5000/api/fetch', {
+                const response = await fetch(`${API_BASE}/faculty/register/${secretKey}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ secretKey }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ facultyID, sheetID, name, email, department })
                 });
-                
                 const data = await response.json();
+                showResponse('registerResponse', data, response.ok);
                 
-                if (response.ok && data.success) {
-                    messageDiv.className = 'message success';
-                    messageDiv.innerHTML = `
-                        ✅ ${data.message}<br>
-                        📊 Total Faculty: ${data.totalFaculty}<br>
-                        🕐 Updated: ${new Date(data.timestamp).toLocaleString()}<br>
-                        📋 Faculty IDs: ${data.facultyIds.join(', ')}
-                    `;
-                    document.getElementById('secretKey').value = '';
-                } else {
-                    messageDiv.className = 'message error';
-                    messageDiv.textContent = '❌ ' + (data.message || 'Failed to update');
+                if (response.ok) {
+                    // Clear form
+                    document.getElementById('newFacultyId').value = '';
+                    document.getElementById('newSheetId').value = '';
+                    document.getElementById('newName').value = '';
+                    document.getElementById('newEmail').value = '';
+                    document.getElementById('newDepartment').value = '';
                 }
             } catch (error) {
-                messageDiv.className = 'message error';
-                messageDiv.textContent = '❌ Network error: ' + error.message;
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🔄 Refresh from Google Sheets';
+                showResponse('registerResponse', { message: 'Network error: ' + error.message }, false);
             }
         }
+        
+        async function refreshFaculty() {
+            const facultyId = document.getElementById('refreshFacultyId').value.trim();
+            const secretKey = document.getElementById('secretKey2').value.trim();
+            
+            if (!facultyId || !secretKey) {
+                showResponse('refreshResponse', { message: 'Faculty ID and Secret Key are required' }, false);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/faculty/${facultyId}/refresh/${secretKey}`);
+                const data = await response.json();
+                showResponse('refreshResponse', data, response.ok);
+            } catch (error) {
+                showResponse('refreshResponse', { message: 'Network error: ' + error.message }, false);
+            }
+        }
+        
+        async function refreshAll() {
+            const secretKey = document.getElementById('secretKey3').value.trim();
+            
+            if (!secretKey) {
+                showResponse('refreshAllResponse', { message: 'Secret Key is required' }, false);
+                return;
+            }
+            
+            try {
+                showResponse('refreshAllResponse', { message: '⏳ Fetching data for all faculty... This may take a moment.' }, true);
+                
+                const response = await fetch(`${API_BASE}/faculty/refreshAll/${secretKey}`);
+                const data = await response.json();
+                showResponse('refreshAllResponse', data, response.ok);
+            } catch (error) {
+                showResponse('refreshAllResponse', { message: 'Network error: ' + error.message }, false);
+            }
+        }
+        
+        async function viewFacultyList() {
+            try {
+                const response = await fetch(`${API_BASE}/faculty`);
+                const data = await response.json();
+                const listDiv = document.getElementById('facultyList');
+                
+                if (data.length === 0) {
+                    listDiv.innerHTML = '<div class="info">No faculty registered yet. Register a faculty member above to get started.</div>';
+                    return;
+                }
+                
+                let html = '';
+                data.forEach(faculty => {
+                    html += `
+                        <div class="faculty-item">
+                            <h4>${faculty.name || faculty.facultyID}</h4>
+                            <p><strong>ID:</strong> ${faculty.facultyID}</p>
+                            <p><strong>Email:</strong> ${faculty.email || 'Not provided'}</p>
+                            <p><strong>Department:</strong> ${faculty.department || 'Not provided'}</p>
+                            <p><strong>Registered:</strong> ${faculty.registeredAt ? new Date(faculty.registeredAt).toLocaleString() : 'N/A'}</p>
+                            <p><strong>Last Updated:</strong> ${faculty.lastUpdated ? new Date(faculty.lastUpdated).toLocaleString() : 'Never'}</p>
+                        </div>
+                    `;
+                });
+                listDiv.innerHTML = html;
+            } catch (error) {
+                document.getElementById('facultyList').innerHTML = 
+                    '<div class="error">Error loading faculty list: ' + error.message + '</div>';
+            }
+        }
+        
+        async function deleteFaculty() {
+            const facultyId = document.getElementById('deleteFacultyId').value.trim();
+            const secretKey = document.getElementById('secretKey4').value.trim();
+            
+            if (!facultyId || !secretKey) {
+                showResponse('deleteResponse', { message: 'Faculty ID and Secret Key are required' }, false);
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to delete faculty "${facultyId}"? This cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/faculty/${facultyId}/${secretKey}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                showResponse('deleteResponse', data, response.ok);
+                
+                if (response.ok) {
+                    document.getElementById('deleteFacultyId').value = '';
+                    viewFacultyList(); // Refresh the list
+                }
+            } catch (error) {
+                showResponse('deleteResponse', { message: 'Network error: ' + error.message }, false);
+            }
+        }
+        
+        function showResponse(elementId, data, success) {
+            const div = document.getElementById(elementId);
+            div.className = `message ${success ? 'success' : 'error'}`;
+            
+            if (typeof data === 'object') {
+                div.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } else {
+                div.textContent = data;
+            }
+        }
+        
+        // Auto-load faculty list on page load
+        window.addEventListener('load', viewFacultyList);
     </script>
 </body>
 </html>

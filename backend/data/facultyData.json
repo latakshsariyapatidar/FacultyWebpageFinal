@@ -468,5 +468,70 @@
         "date": "06-01-2026"
       }
     ]
+  },
+  {
+    "faculty_id": "FAC002",
+    "facultyID": "FAC002",
+    "personalInfo": {
+      "faculty_id": "FAC002",
+      "name": "Test",
+      "designation": "TEST",
+      "department": "TEST",
+      "profileImage": "TEST",
+      "email": "TEST",
+      "phone": "TEST",
+      "landline": "TEST",
+      "office": "TEST",
+      "address": "TEST",
+      "bio": "TEST"
+    },
+    "about": {
+      "researchPositions": [],
+      "links": []
+    },
+    "biography": {
+      "experience": [],
+      "education": []
+    },
+    "courses": [],
+    "research": {
+      "interests": [],
+      "fundingInfo": {
+        "phdPositions": "",
+        "mtechPositions": "",
+        "note": "",
+        "phd_application_link": "",
+        "phd_email_template": "",
+        "mtech_application_link": "",
+        "mtech_email_template": "",
+        "requirements": []
+      }
+    },
+    "publications": {
+      "patents": [],
+      "journals": [],
+      "conferences": [
+        {
+          "faculty_id": "FAC002",
+          "title": "AI-based Load Forecasting for Smart Grids",
+          "authors": "P. Mehta, K. Singh",
+          "conference": "IEEE PES General Meeting",
+          "year": "2024",
+          "location": "Orlando, USA",
+          "pdf_link": "",
+          "external_link": ""
+        }
+      ],
+      "bookChapters": []
+    },
+    "students": {
+      "instructions": [],
+      "current": [],
+      "graduated": []
+    },
+    "news": [],
+    "gallery": [],
+    "statistics": [],
+    "resources": []
   }
 ]

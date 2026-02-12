@@ -9,7 +9,12 @@
 !package.json
 !package-lock.json
 !vercel.json
-!data/facultyData.json
+
+# Data files - Faculty data should not be committed
+# Registry is OK to commit, but individual faculty data is excluded
+!data/facultyRegistry.json
+data/faculty/*.json
+data/facultyData.json
 
 # Dependencies
 node_modules/

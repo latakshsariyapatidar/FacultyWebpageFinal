@@ -1,7 +1,9 @@
 /**
  * Custom Hook: useFacultyData
  * 
- * Handles fetching and caching of faculty data.
+ * Handles fetching and caching of faculty data from the new backend API.
+ * - Fetches list of all faculty (metadata only)
+ * - Fetches complete data for specific faculty
  * Provides loading, error states, and automatic retry logic.
  * 
  * @module hooks/useFacultyData
@@ -15,14 +17,14 @@ import { fetchFacultyData, fetchAllFacultyData, validateFacultyData } from '../s
  * 
  * @param {string} facultyId - Required faculty ID to fetch specific faculty
  * @returns {Object} Hook state
- * @returns {Object|null} state.data - Faculty data
+ * @returns {Object|null} state.data - Complete faculty data
  * @returns {boolean} state.loading - Loading state
  * @returns {string|null} state.error - Error message if any
  * @returns {Function} state.refetch - Function to refetch data
- * @returns {Array} state.allFaculty - All faculty members (for selection)
+ * @returns {Array} state.allFaculty - All faculty members metadata (for selection/listing)
  * 
  * @example
- * const { data, loading, error, refetch, allFaculty } = useFacultyData('faculty123');
+ * const { data, loading, error, refetch, allFaculty } = useFacultyData('prof_john_doe');
  * 
  * if (loading) return <LoadingSpinner />;
  * if (error) return <ErrorMessage message={error} onRetry={refetch} />;

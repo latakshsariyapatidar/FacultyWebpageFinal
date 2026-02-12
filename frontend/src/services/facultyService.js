@@ -21,15 +21,16 @@ const apiClient = axios.create({
 });
 
 /**
- * Fetch all faculty data from the backend
+ * Fetch list of all faculty from the backend
+ * Returns metadata for all registered faculty (not full data)
  * 
- * @returns {Promise<Array>} Array of faculty data objects
+ * @returns {Promise<Array>} Array of faculty metadata objects
  * @throws {Error} When the API request fails
  */
 export const fetchAllFacultyData = async () => {
   try {
-    // Request without facultyId to get all faculty
-    const response = await apiClient.get(API_ENDPOINTS.FACULTY_DATA);
+    // Get list of all faculty (metadata only)
+    const response = await apiClient.get(API_ENDPOINTS.FACULTY_LIST);
     const data = response.data;
     
     // Ensure we always return an array
@@ -54,11 +55,11 @@ export const fetchAllFacultyData = async () => {
 };
 
 /**
- * Fetch faculty data from the backend by facultyID
- * Backend will pull fresh data from Google Sheets, update JSON, and return specific faculty
+ * Fetch complete faculty data from the backend by facultyID
+ * Reads from individual faculty JSON file (backend/data/faculty/{facultyId}.json)
  * 
  * @param {string} facultyId - Required faculty ID to fetch specific faculty
- * @returns {Promise<Object>} Faculty data object
+ * @returns {Promise<Object>} Complete faculty data object
  * @throws {Error} When the API request fails or facultyID not found
  */
 export const fetchFacultyData = async (facultyId) => {
@@ -68,11 +69,11 @@ export const fetchFacultyData = async (facultyId) => {
       throw new Error('Faculty ID is required');
     }
     
-    // Send facultyId as query parameter
-    const response = await apiClient.get(`${API_ENDPOINTS.FACULTY_DATA}?facultyId=${encodeURIComponent(facultyId)}`);
+    // Use path parameter instead of query parameter
+    const response = await apiClient.get(API_ENDPOINTS.FACULTY_DATA(facultyId));
     const data = response.data;
     
-    // Backend returns single faculty object when facultyId is provided
+    // Backend returns single faculty object
     if (!data) {
       throw new Error('No faculty data received');
     }
