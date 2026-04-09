@@ -22,6 +22,7 @@ import { facultyRoutes, healthRoutes } from './routes/index.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import logger from './utils/logger.js';
 import { getFacultyCount } from './models/facultyModel.js';
+import morgan from 'morgan';
 
 // Initialize Express app
 const app = express();
@@ -42,6 +43,10 @@ if (config.server.env === 'development') {
   });
 }
 
+// Development logging
+if ((process.env.NODE_ENV || "").trim() === "development") {
+    app.use(morgan('dev'));
+}
 // ==================== ROUTES ====================
 
 // Health check route
