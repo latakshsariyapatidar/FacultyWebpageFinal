@@ -7,16 +7,26 @@
     "department": "Electrical Engineering",
     "jsonFile": "FAC001.json",
     "registeredAt": "2026-02-12T19:16:30.862Z",
-    "lastUpdated": "2026-02-12T19:40:46.438Z"
+    "lastUpdated": "2026-03-18T06:35:56.314Z"
   },
   {
-    "facultyID": "FAC002",
-    "sheetID": "1E_bHyI2zxukwMRxowmx47cWs-N6cCnBGKFWkC2tDWdc",
-    "name": "Professor2",
-    "email": "lataksh.sariya@axl",
-    "department": "electrical",
-    "jsonFile": "FAC002.json",
-    "registeredAt": "2026-02-12T19:40:07.142Z",
-    "lastUpdated": "2026-02-12T19:41:01.006Z"
+    "facultyID": "anything",
+    "sheetID": "13QOUgYYhR6IBL91HblqH5acJk-rzKWRiQfKdVTpsnh8",
+    "name": "Professor Name",
+    "email": "Professor Email",
+    "department": "Department",
+    "jsonFile": "anything.json",
+    "registeredAt": "2026-02-13T14:43:35.396Z",
+    "lastUpdated": "2026-03-18T06:35:57.930Z"
+  },
+  {
+    "facultyID": "aniketVK",
+    "sheetID": "1DR6RmTE1465BZOY-iiDye5aIpmeYItC0UXJyJCt66f8",
+    "name": "Dr. Aniket Vasantrao Kataware",
+    "email": "aniket.kataware@iitdh.ac.in",
+    "department": "Department of Civil and Infrastructure Engineering",
+    "jsonFile": "aniketVK.json",
+    "registeredAt": "2026-03-18T06:34:34.044Z",
+    "lastUpdated": "2026-03-18T06:35:58.997Z"
   }
 ]
