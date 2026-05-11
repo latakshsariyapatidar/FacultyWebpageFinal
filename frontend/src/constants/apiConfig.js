@@ -8,7 +8,7 @@
  */
 
 // Base URL configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:7999';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://10.195.250.176:8000';
 
 /**
  * API endpoints configuration

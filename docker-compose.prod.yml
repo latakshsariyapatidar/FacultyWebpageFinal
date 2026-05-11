@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: faculty-backend-prod
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/config:/app/config
+    networks:
+      - faculty-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: node server.js
+
+  # Admin Server
+  admin:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.admin
+    container_name: faculty-admin-prod
+    environment:
+      - NODE_ENV=production
+      - PORT=7997
+    ports:
+      - "7997:7997"
+    volumes:
+      - ./frontend:/app:ro
+      - /app/node_modules
+    networks:
+      - faculty-network
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    command: node admin-server.js
+
+  # Frontend React SPA
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=https://faculty.iitdh.ac.in/api
+        - REACT_APP_ADMIN_URL=https://faculty.iitdh.ac.in/admin
+    container_name: faculty-frontend-prod
+    environment:
+      - REACT_APP_API_URL=https://faculty.iitdh.ac.in/api
+      - REACT_APP_ADMIN_URL=https://faculty.iitdh.ac.in/admin
+    networks:
+      - faculty-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: faculty-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - faculty-network
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+      - admin
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  faculty-network:
+    driver: bridge

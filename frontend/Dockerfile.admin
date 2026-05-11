@@ -1,0 +1,19 @@
+# Admin Server Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy admin server and all necessary files
+COPY admin-server.js ./
+COPY admin.html ./
+COPY public ./public
+
+EXPOSE 7997
+
+CMD ["node", "admin-server.js"]

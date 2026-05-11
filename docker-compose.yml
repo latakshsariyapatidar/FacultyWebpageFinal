@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Frontend React SPA
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: faculty-frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_ADMIN_URL=http://localhost:7997
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - /app/node_modules
+    networks:
+      - faculty-network
+    depends_on:
+      - backend
+      - admin
+
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: faculty-backend
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/config:/app/config
+    networks:
+      - faculty-network
+    command: node server.js
+
+  # Admin Server
+  admin:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.admin
+    container_name: faculty-admin
+    environment:
+      - NODE_ENV=production
+      - PORT=7997
+    ports:
+      - "7997:7997"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - faculty-network
+    command: node admin-server.js
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:latest
+    container_name: faculty-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./frontend/build:/usr/share/nginx/html:ro
+    networks:
+      - faculty-network
+    depends_on:
+      - frontend
+      - backend
+      - admin
+    restart: unless-stopped
+
+networks:
+  faculty-network:
+    driver: bridge
