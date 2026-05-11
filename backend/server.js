@@ -67,20 +67,7 @@ app.use(errorHandler);
 
 const PORT = config.server.port;
 
-const server = app.listen(PORT, () => {
-  logger.success(`Server running on http://localhost:${PORT}`);
-  logger.stats(`Environment: ${config.server.env}`);
-  logger.stats(`Registered faculty: ${getFacultyCount()}`);
-  logger.info('API Endpoints:');
-  console.log('  📋 GET    /api/faculty                              - List all faculty');
-  console.log('  📖 GET    /api/faculty/:facultyId                   - Get faculty data');
-  console.log('  ➕ POST   /api/faculty/register/:secretKey          - Register faculty');
-  console.log('  🔄 GET    /api/faculty/:facultyId/refresh/:secretKey - Refresh faculty data');
-  console.log('  🔄 GET    /api/faculty/refreshAll/:secretKey        - Refresh all faculty');
-  console.log('  🗑️  DELETE /api/faculty/:facultyId/:secretKey        - Delete faculty');
-  console.log('  💚 GET    /health                                   - Health check');
-  console.log('\n  Press Ctrl+C to stop the server');
-});
+const server = app.listen(PORT, '0.0.0.0');
 
 // Handle graceful shutdown
 process.on('SIGTERM', () => {

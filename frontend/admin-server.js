@@ -13,6 +13,4 @@ app.get("/", (req, res) => {
 
 const PORT = 7997;
 
-app.listen(PORT, () => {
-  console.log(`Admin panel running at http://10.195.250.60:${PORT}`);
-});
+app.listen(PORT, '0.0.0.0');
