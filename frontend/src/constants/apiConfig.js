@@ -8,14 +8,14 @@
  */
 
 // Base URL configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://10.195.250.176:8000';
+const API_BASE_URL = (process.env.REACT_APP_API_URL || '/api').replace(/\/$/, '');
 
 /**
  * API endpoints configuration
  */
 export const API_ENDPOINTS = {
-  FACULTY_LIST: `${API_BASE_URL}/api/faculty`,
-  FACULTY_DATA: (facultyId) => `${API_BASE_URL}/api/faculty/${facultyId}`,
+  FACULTY_LIST: `${API_BASE_URL}/faculty`,
+  FACULTY_DATA: (facultyId) => `${API_BASE_URL}/faculty/${facultyId}`,
 };
 
 /**

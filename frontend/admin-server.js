@@ -11,6 +11,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "admin.html"));
 });
 
-const PORT = 7997;
+const PORT = process.env.PORT || 7997;
+const HOST = process.env.HOST || '0.0.0.0';
 
-app.listen(PORT, '0.0.0.0');
+app.listen(PORT, HOST);

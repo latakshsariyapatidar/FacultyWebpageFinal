@@ -11,7 +11,7 @@
  * API Configuration
  */
 export const API_CONFIG = {
-  baseUrl: process.env.REACT_APP_API_URL || 'http://10.195.250.176:8000',
+  baseUrl: (process.env.REACT_APP_API_URL || '/api').replace(/\/$/, ''),
   timeout: parseInt(process.env.REACT_APP_API_TIMEOUT) || 10000,
 };
 

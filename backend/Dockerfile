@@ -1,25 +1,31 @@
-# Backend API Server Dockerfile
-FROM node:18-alpine
+# ============================================
+# Backend API - Dockerfile
+# Node.js Express server for Faculty API
+# ============================================
 
+FROM node:20-alpine
+
+# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy dependency files first (for Docker layer caching)
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Install production dependencies only
+RUN npm install --omit=dev
 
-# Copy backend code
-COPY server.js ./
-COPY config ./config
-COPY controllers ./controllers
-COPY middleware ./middleware
-COPY models ./models
-COPY routes ./routes
-COPY services ./services
-COPY utils ./utils
-COPY data ./data
+# Copy application source code
+COPY . .
 
+# Create data directories (for faculty JSON storage)
+RUN mkdir -p data/faculty
+
+# Expose the API port
 EXPOSE 8000
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8000/health || exit 1
+
+# Start the server
 CMD ["node", "server.js"]
